@@ -1,6 +1,6 @@
 package com.jatin.smart_appointment_scheduler.entities;
 
-import com.jatin.smart_appointment_scheduler.enums.Specilization;
+import com.jatin.smart_appointment_scheduler.enums.Specialization;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +19,7 @@ public class Provider extends User{
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Specilization specilization;
+    private Specialization specilization;
 
     @Column(nullable = false)
     private String npiNumber;
