@@ -1,5 +1,6 @@
 package com.jatin.smart_appointment_scheduler.entities;
 
+import com.jatin.smart_appointment_scheduler.enums.Gender;
 import com.jatin.smart_appointment_scheduler.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,10 @@ public abstract class User {
 
     @Column(nullable = false)
     private String lastName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender;
 
     @Column(nullable = false, unique = true)
     @Email(message = "Please provide a valid email address")
