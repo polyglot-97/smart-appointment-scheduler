@@ -19,4 +19,7 @@ public class Clinic {
     private String name;
 
     private String address;
+
+    @Column(nullable = false)
+    private Boolean isActive = true;
 }
