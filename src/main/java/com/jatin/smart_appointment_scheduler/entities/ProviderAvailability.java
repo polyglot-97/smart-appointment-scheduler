@@ -7,6 +7,9 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Set;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "provider_availability")
@@ -15,6 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class ProviderAvailability {
 
     @Id
@@ -44,21 +48,14 @@ public class ProviderAvailability {
     @Column(nullable = false)
     private LocalTime endTime;
 
+    @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    @PrePersist
-    public void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
-        createdAt = now;
-        updatedAt = now;
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+    @Column(nullable = false)
+    private Boolean isActive = true;
 }
