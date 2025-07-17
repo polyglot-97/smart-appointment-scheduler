@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.data.annotation.CreatedDate;
 
 
 @Entity
@@ -23,14 +24,6 @@ public class Encounter {
     @OneToOne
     @JoinColumn(name = "appointment_id", nullable = false)
     private Appointment appointment;
-
-    @ManyToOne
-    @JoinColumn(name = "patient_id", nullable = false)
-    private Patient patient;
-
-    @ManyToOne
-    @JoinColumn(name = "provider_id", nullable = false)
-    private Provider provider;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "encounter_cpt_codes", joinColumns = @JoinColumn(name = "encounter_id"))
@@ -52,12 +45,10 @@ public class Encounter {
     @Column(name = "unit")
     private List<Integer> units;
 
-    @Column(nullable = false)
+    @CreatedDate
+    @Column(nullable = false, updatable = false)
     private LocalDateTime serviceDate;
 
-    @PrePersist
-    public void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
-        serviceDate = now;
-    }
+    @Column(nullable = false)
+    private Boolean isActive = true;
 }
