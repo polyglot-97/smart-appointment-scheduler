@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Service
@@ -27,12 +28,44 @@ public class AppointmentService {
     private final PatientRepository patientRepository;
     private final ProviderRepository providerRepository;
     private final ClinicRepository clinicRepository;
+    private final RulesEngineService rulesEngineService;
 
+    @Transactional
     public AppointmentResponseDTO create(AppointmentRequestDTO dto) {
         try {
             Appointment appointment = mapToEntity(dto);
             appointment.setIsActive(true);
-            return mapToDTO(appointmentRepository.save(appointment));
+            
+            // Evaluate rules before saving appointment
+            Map<String, Object> ruleResults = rulesEngineService.evaluateRulesForAppointment(appointment);
+            
+            // Check if any rules failed and should block appointment creation
+            for (Map.Entry<String, Object> entry : ruleResults.entrySet()) {
+                if (entry.getValue() instanceof RulesEngineService.RuleEvaluationResult) {
+                    RulesEngineService.RuleEvaluationResult result = (RulesEngineService.RuleEvaluationResult) entry.getValue();
+                    if (!result.isPassed()) {
+                        String ruleName = entry.getKey();
+                        String failAction = result.getFailAction();
+                        
+                        // If fail action is "BLOCK" or "REJECT", don't allow appointment creation
+                        if ("BLOCK".equalsIgnoreCase(failAction) || "REJECT".equalsIgnoreCase(failAction)) {
+                            throw new IllegalStateException(
+                                String.format("Appointment creation blocked by rule '%s': %s", 
+                                    ruleName, result.getFailedStep()));
+                        }
+                    }
+                }
+            }
+            
+            // Save appointment if all rules passed or only had non-blocking failures
+            Appointment savedAppointment = appointmentRepository.save(appointment);
+            // Access LOB field before session closes
+            if (savedAppointment.getNotes() != null) {
+                savedAppointment.getNotes();
+            }
+            logger.info("Appointment created successfully with rule evaluation results: {}", ruleResults);
+            
+            return mapToDTO(savedAppointment);
         } catch (Exception e) {
             logger.error("Unexpected error in create appointment", e);
             throw new RuntimeException("Failed to create appointment", e);

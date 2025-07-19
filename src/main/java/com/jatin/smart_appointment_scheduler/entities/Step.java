@@ -24,7 +24,7 @@ public class Step {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "rule_id", nullable = false)
+    @JoinColumn(name = "rule_id", nullable = true)
     private Rule rule;
 
     @ManyToOne

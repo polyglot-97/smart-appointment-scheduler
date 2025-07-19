@@ -24,7 +24,7 @@ public class Rule {
     private String description;
 
     @OneToOne
-    @JoinColumn(name = "starting_step_id", nullable = false)
+    @JoinColumn(name = "starting_step_id", nullable = true)
     private Step startingStep;
 
     @Column(nullable = false)
