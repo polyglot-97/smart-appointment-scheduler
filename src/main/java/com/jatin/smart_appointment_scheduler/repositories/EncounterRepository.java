@@ -9,4 +9,9 @@ import java.util.Optional;
 public interface EncounterRepository extends JpaRepository<Encounter, Long> {
     List<Encounter> findAllByIsActiveTrue();
     Optional<Encounter> findByIdAndIsActiveTrue(Long id);
+    
+    /**
+     * Find encounters by patient ID ordered by service date descending
+     */
+    List<Encounter> findByAppointmentPatientIdAndIsActiveTrueOrderByServiceDateDesc(Long patientId);
 } 
